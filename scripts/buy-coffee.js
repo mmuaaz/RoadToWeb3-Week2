@@ -40,25 +40,35 @@ async function main() {
     console.log("BuyMeACoffee deployed to:", buyMeACoffee.address)
 
     // Check balances before the coffee purchase.
-    const addresses = [owner.address, tipper.address, buyMeACoffee.address]
+    const addresses = [owner.address, tipper.address, tipper2.address, buyMeACoffee.address]
     console.log("== start ==")
     await printBalances(addresses)
 
     // Buy the owner a few coffees.
-    const tip = { value: hre.ethers.utils.parseEther("1") }
-    await buyMeACoffee.connect(tipper).buyCoffee("Johny Bravo", "Right You earned it!!", tip) //third field is the optional in a celebrity function call; include
+    const tip = { value: hre.ethers.utils.parseEther("32") }
+    await buyMeACoffee
+        .connect(tipper)
+        .buyCoffee("Johny Bravo", "Yeah sure take all my money!!", tip) //third field is the optional in a celebrity function call; include
     // this option array as optional
-    await buyMeACoffee.connect(tipper2).buyCoffee("Dexter", "Good work Sir!!!", tip)
+    await buyMeACoffee.connect(tipper2).buyCoffee("Loffer", "REallyy!!!", tip)
     await buyMeACoffee
         .connect(tipper3)
-        .buyCoffee("Bean", "I am still waiting for my proof of knowledge ", tip)
+        .buyCoffee("Serious", "I am still waiting for my proof of knowledge ", {
+            value: hre.ethers.utils.parseEther("60"),
+        })
 
     // Check balances after the coffee purchase.
     console.log("== bought coffee ==")
     await printBalances(addresses)
 
+    //Checking Delegates
+    //console.log(`Current Delegate is ${buyMeACoffee.delegates.address}`)
+
+    //Delegate withdrawal to another Address
+    await buyMeACoffee.connect(owner).delegateWithdrawAuthority(tipper2.address)
+    //  console.log(`New Delegate is ${buyMeACoffee.delegates.address}`)
     // Withdraw.
-    await buyMeACoffee.connect(owner).withdrawTips()
+    await buyMeACoffee.connect(tipper2).withdrawTips()
 
     // Check balances after withdrawal.
     console.log("== withdrawTips ==")
